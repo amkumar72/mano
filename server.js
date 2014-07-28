@@ -9,7 +9,7 @@ var http = require('http'),
     server = http.createServer(),
     regExp = {
         apiVersion: new RegExp('^v[0-9]+$', 'i'),
-        date: new RegExp('^20[1-9][0-9][01][0-9][01][0-9]$')
+        date: new RegExp('^20[1-9][0-9][01][0-9][0-3][0-9]$')
     },
     errorId = 0,
     port = 3000,                        // Configuration: Port Number
@@ -77,7 +77,8 @@ server.on('request', function (request, response) {
                     notFound(response);
                 } else {
                     if(!regExp.apiVersion.test(segments[1])) {
-                        notFound(response, 'Invalid api version.');
+                        notFound(response, 
+                            'Invalid api version. Expected: /api/v1/...');
                     } else {
                         fileName = './' + segments[0] 
                                     + '/' + segments[1]
@@ -106,19 +107,22 @@ server.on('request', function (request, response) {
             case 'log':     // Format: ^/log/20[1-9][0-9][01][0-9][01][0-9]$
             case 'error':   // Format: ^/error/20[1-9][0-9][01][0-9][01][0-9]$
                 if(isDevelopment()) {
-                    fileName = segments[1] + '/';
-                    if(segments.length==3) {
+                    fileName = './' + segments[0] + '/';
+                    if(segments.length==2) {
                         // Date is specified
-                        if(!regExp.date.test(segments[2])) {
-                            notFound(response, 'Invalid date.');
+                        if(!regExp.date.test(segments[1])) {
+                            notFound(response, 
+                                'Invalid date. Expected: /' + segments[0]
+                                    + '/' + getDateStamp());
                         } else {
-                            fileName += segments[2];
+                            fileName += segments[1];
                         }
                     } else {
                         // Default to today
                         fileName += getDateStamp();
                     }
-                    // TODO: Render the error/log file                  
+                    // TODO: Render the error/log file
+                    done(response, 'No data:' + fileName, 200, 'text/plain');              
                 } else {
                     notFound(response);
                 }
