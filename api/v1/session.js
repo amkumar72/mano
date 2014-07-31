@@ -1,6 +1,7 @@
 
 //------------------------------------------------------------------------------
-function process (method, 
+function process (server,
+    method, 
     segments, 
     inputs, 
     request, 
