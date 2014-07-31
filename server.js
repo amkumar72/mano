@@ -21,9 +21,8 @@ var http = require('http'),
     logFile,
     errorFile,
     errorId = 0,
-    port = 3000,                        // Configuration: Port Number
-    env = environments.Development,     // Configuration: Environment
-    logAPICalls = false;                // Configuration: Logging
+    configurations, // All configuration are loaded into this
+    config;         // The configuration for the current module (server)
 
 //------------------------------------------------------------------------------
 // Private methods
@@ -61,7 +60,7 @@ function getLogId () {
 }
 //------------------------------------------------------------------------------
 function isDevelopment () {
-    return env === environments.Development;
+    return config.env === environments.Development;
 }
 //------------------------------------------------------------------------------
 function done (request, response, result, code, type) {
@@ -125,7 +124,7 @@ server.on('request', function (request, response) {
             fileExt = '',
             logOrErrorFile;
         
-        if(logAPICalls || isDevelopment()) {
+        if(config.logAPICalls || isDevelopment()) {
             logEntry = '\n##APICall,' + getDateTimeStamp() + ',' + getLogId()
                 + ': ' + request.url;
             logFile.write(logEntry);
@@ -148,7 +147,7 @@ server.on('request', function (request, response) {
                         if(api) {
                             // TODO: Combine form variables with query as inputs
                             api.process(
-                                null,
+                                { config: configurations },
                                 method, 
                                 segments, 
                                 query, 
@@ -222,6 +221,9 @@ server.on('request', function (request, response) {
 //------------------------------------------------------------------------------
 // Initialize
 
+configurations = JSON.parse(fs.readFileSync('./config.json'));
+config = configurations.server;
+
 fileOptions = {
         flags: 'a',
         encoding: null,
@@ -239,12 +241,12 @@ if(!fs.existsSync('./error')) {
 errorFile = fs.createWriteStream('./error/' + getDateStamp() + '.err.log',
                 fileOptions);
 
-server.listen(port);
+server.listen(config.port);
 
 logFile.write('\n##Server started,' + getDateTimeStamp() + ',' + serverId);
 
 if(isDevelopment()) {
-    console.log('API Server started on port %d', port);
+    console.log('API Server started on port %d', config.port);
 }
 
 //------------------------------------------------------------------------------

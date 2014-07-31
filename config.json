@@ -1,0 +1,22 @@
+{
+	"_comments": [
+		"Configuration for each js file is stored in an object",
+		" with the same name as the file located in the same path."
+	],
+
+	"server": {
+		"_comments": "env can be 0 for Development or 1 for Production",
+
+	    "port": 3000,                        
+	    "env": 0,
+	    "logAPICalls": false
+	},
+
+	"api": {
+		"v1": {
+			"session": {
+
+			}
+		}
+	}
+}
