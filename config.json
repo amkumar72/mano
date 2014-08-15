@@ -1,21 +1,17 @@
+// Configuration for each js file is stored in an object
+// with the same name as that file located in the same path.
 {
-	"_comments": [
-		"Configuration for each js file is stored in an object",
-		" with the same name as the file located in the same path."
-	],
-
 	"server": {
-		"_comments": "env can be 0 for Development or 1 for Production",
-
-	    "port": 3000,                        
-	    "env": 0,
+	    "port": 3000,
+	    "env": 0, 	// 0 for Development and 1 for Production.
 	    "logAPICalls": false
 	},
 
 	"api": {
 		"v1": {
 			"session": {
-
+				"defaultType": "own",
+				"timeout": 30  // Delay in minutes before session times out.
 			}
 		}
 	}
