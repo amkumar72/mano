@@ -108,7 +108,7 @@ server.on('request', function (request, response) {
         switch (segments[0]) {
             // API call
             case 'api':     // Format: ^/api/v[0-9]+/
-                if(segments.length<3) {
+                if(segments.length < 3) {
                     notFound(request, response);
                 } else {
                     if(!regExp.apiVersion.test(segments[1])) {
@@ -122,13 +122,15 @@ server.on('request', function (request, response) {
                         if(api) {
                             // TODO: Combine form variables with query as inputs
                             api.process(
-                                { config: configurations },
+                                { 
+                                    config: configurations,
+                                    isDevelopment: isDevelopment()
+                                },
                                 method, 
                                 segments, 
                                 query, 
                                 request, 
                                 response, 
-                                isDevelopment(), 
                                 function (result, error, code) {
                                     if(!error) {
                                         done(request, response, result);
@@ -150,7 +152,7 @@ server.on('request', function (request, response) {
                 fileExt += '.log';
                 if(isDevelopment()) {
                     fileName = './' + segments[0] + '/';
-                    if(segments.length==2) {
+                    if(segments.length === 2) {
                         // Date is specified
                         if(!regExp.date.test(segments[1])) {
                             notFound(request, response, 
@@ -184,7 +186,7 @@ server.on('request', function (request, response) {
                 break;
         }
     } catch(error) {
-        if(error.code && error.code=='MODULE_NOT_FOUND') {
+        if(error.code && error.code == 'MODULE_NOT_FOUND') {
             notFound(request, response);
         } else {
             apiError(request, response, error);

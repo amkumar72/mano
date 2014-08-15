@@ -1,7 +1,13 @@
 
 //------------------------------------------------------------------------------
 // Private members
-var config;
+var utilities = require('../../utilities'),
+
+    config,
+    actions = {
+        login: utilities.actions.create,
+        logout: utilities.actions.delete
+    };
 
 
 //------------------------------------------------------------------------------
@@ -10,23 +16,35 @@ var config;
 function process (server,
     method, 
     segments, 
-    inputs, 
+    input, 
     request, 
     response, 
-    isDevelopment, 
     callback) 
 {
     config = server.config.api.v1.session;
 
-    // Test async
+    // TODO: Authenticate using user credentials stored in DB
+    // Start: Stub
     setTimeout(function () {
-        var sessionId = (segments.length ==3 ? segments[2] : null);
+        var sessionId = (segments.length === 4 ? segments[3] : null);
         try {
-            switch(method) {
-                case 'POST': // Login
-                    callback({ id: 1 });
+            switch(utilities.getAction(method, segments, input)) {
+                case actions.login:
+                    sessionId = 0;
+                    switch(input.loginName) {
+                        case 'manoj':
+                            if(input.password === 'pwd') {
+                                sessionId = 1;
+                            }
+                            break;
+                    }
+                    if(sessionId != 0) {
+                        callback({ id: sessionId });
+                    } else {
+                        callback(null, 'Invalid login credentials');
+                    }
                     break;
-                case 'DELETE': // Logout
+                case actions.logout:
                     callback({ });
                     break;
                 default:
@@ -36,6 +54,8 @@ function process (server,
             callback(null, error);
         }
     }, 0);
+    // End: Stub
+
 }
 
 module.exports.process = process;
