@@ -6,6 +6,8 @@ var http = require('http'),
     url = require('url'),
     fs = require('fs'),
     uuid = require('node-uuid'),
+    utilities = require('./utilities'),
+
     environments = {
         'Development': 0,
         'Production': 1
@@ -27,34 +29,6 @@ var http = require('http'),
 //------------------------------------------------------------------------------
 // Private methods
 
-function getDateStamp () {
-    var today = new Date(),
-        year = today.getFullYear(),
-        month = today.getMonth()+1,
-        day = today.getDate();
-
-    return year.toString() 
-        + (month<10 ? ('0'+month) : month) 
-        + (day<10 ? ('0'+day) : day);
-}
-//------------------------------------------------------------------------------
-function getDateTimeStamp () {
-    var today = new Date(),
-        year = today.getFullYear(),
-        month = today.getMonth()+1,
-        day = today.getDate(),
-        hour = today.getHours(),
-        min = today.getMinutes(),
-        sec = today.getSeconds();
-
-    return year.toString() 
-        + (month<10 ? ('0'+month) : month) 
-        + (day<10 ? ('0'+day) : day)
-        + (hour<10 ? ('0'+hour) : hour)
-        + (min<10 ? ('0'+min) : min)
-        + (sec<10 ? ('0'+sec) : sec)
-}
-//------------------------------------------------------------------------------
 function getLogId () {
     return serverId + '#' + (logId++);
 }
@@ -90,7 +64,7 @@ function apiError (request, response, error, code) {
         error: isDevelopment() ? error : 
                     'Sorry, unable to service this request.'
     }
-    errorEntry = '\n##APIError,' + getDateTimeStamp() + ',' + errorId
+    errorEntry = '\n##APIError,' + utilities.getDateTimeStamp() + ',' + errorId
         + ': ' + request.url
         + ': ' + code
         + ': ' + error;
@@ -125,7 +99,8 @@ server.on('request', function (request, response) {
             logOrErrorFile;
         
         if(config.logAPICalls || isDevelopment()) {
-            logEntry = '\n##APICall,' + getDateTimeStamp() + ',' + getLogId()
+            logEntry = '\n##APICall,' + utilities.getDateTimeStamp() 
+                + ',' + getLogId()
                 + ': ' + request.url;
             logFile.write(logEntry);
         }
@@ -180,13 +155,13 @@ server.on('request', function (request, response) {
                         if(!regExp.date.test(segments[1])) {
                             notFound(request, response, 
                                 'Invalid date. Expected: /' + segments[0]
-                                    + '/' + getDateStamp());
+                                    + '/' + utilities.getDateStamp());
                         } else {
                             fileName += segments[1];
                         }
                     } else {
                         // Default to today
-                        fileName += getDateStamp();
+                        fileName += utilities.getDateStamp();
                     }
                     fileName += fileExt;
                     fs.exists(fileName, function(exists) {
@@ -233,17 +208,19 @@ fileOptions = {
 if(!fs.existsSync('./log')) {
     fs.mkdirSync('./log');
 };
-logFile = fs.createWriteStream('./log/' + getDateStamp() + '.log', fileOptions);
+logFile = fs.createWriteStream('./log/' + utilities.getDateStamp() 
+            + '.log', fileOptions);
 
 if(!fs.existsSync('./error')) {
     fs.mkdirSync('./error');
 };
-errorFile = fs.createWriteStream('./error/' + getDateStamp() + '.err.log',
-                fileOptions);
+errorFile = fs.createWriteStream('./error/' + utilities.getDateStamp() 
+                + '.err.log', fileOptions);
 
 server.listen(config.port);
 
-logFile.write('\n##Server started,' + getDateTimeStamp() + ',' + serverId);
+logFile.write('\n##Server started,' + utilities.getDateTimeStamp() 
+    + ',' + serverId);
 
 if(isDevelopment()) {
     console.log('API Server started on port %d', config.port);
