@@ -11,7 +11,7 @@ var utilities = require('../../utilities'),
 
 
 //------------------------------------------------------------------------------
-// Public members
+// Public methods
 
 function process (server,
     method, 

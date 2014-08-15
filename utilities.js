@@ -14,10 +14,13 @@ var utilities = {},
 	}
 
 //------------------------------------------------------------------------------
-// Public methods
+// Public members
 
 utilities.actions = actions;
+
 //------------------------------------------------------------------------------
+// Public methods
+
 utilities.getDateStamp = function (date) {
     var date = date || new Date(),
         year = date.getFullYear(),
